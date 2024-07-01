@@ -44,16 +44,22 @@ class ShoppingListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-        onPressed: () {
-          onCartChanged(product, inCart);
-        },
-
-        child: Text(
-          product.number,
-          textAlign: TextAlign.center,
-          style: TextStyle(backgroundColor: Colors.blue),
-        ),
-      );
+      style: ElevatedButton.styleFrom(
+        shadowColor: Colors.greenAccent,
+        elevation: 3,
+        shape: CircleBorder(),
+        padding: EdgeInsets.all(20),
+        minimumSize: Size(40, 40),
+      ),
+      onPressed: () {
+        onCartChanged(product, inCart);
+      },
+      child: Text(
+        product.number,
+        textAlign: TextAlign.center,
+        style: TextStyle(backgroundColor: Colors.blue),
+      ),
+    );
   }
 }
 
@@ -94,29 +100,27 @@ class _ShoppingListState extends State<ShoppingList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          leading: SvgPicture.asset(
-            'assets/images/espresso.svg',
-            semanticsLabel: 'SVG Logo',
+      appBar: AppBar(
+        leading: SvgPicture.asset(
+          'assets/images/espresso.svg',
+          semanticsLabel: 'SVG Logo',
+        ),
+        title: const Text('Guqin App'),
+      ),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: widget.products.map((product) {
+              return ShoppingListItem(
+                product: product,
+                inCart: _shoppingCart.contains(product),
+                onCartChanged: _handleCartChanged,
+              );
+            }).toList(),
           ),
-          title: const Text('Guqin App'),
-        ),
-        body: Column(
-          children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: widget.products.map((product) {
-                    return ShoppingListItem(
-                      product: product,
-                      inCart: _shoppingCart.contains(product),
-                      onCartChanged: _handleCartChanged,
-                    );
-                  }).toList(),
-        ),
-
-
-          ],
-        ),
+        ],
+      ),
     );
   }
 }
@@ -132,7 +136,7 @@ void main() {
         GuqinString(number: '4'),
         GuqinString(number: '5'),
         GuqinString(number: '6'),
-        GuqinString(number: '7'),
+        GuqinString(number: '7')
       ],
     ),
   ));
