@@ -15,31 +15,61 @@ class GuqinTunerApp extends StatelessWidget {
     return const MaterialApp(
       home: Scaffold(
         body: Center(
-          child: Column(
-            children: [
-              Flexible(
-                flex: 10,
-                child: Center(
-                  child: Text("note"),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: Column(
-                    children: [GuqinStringSelector(),],
-                  ),
-              )
-
-            ],
-          ),
+          child: MainDisplay(),
         ),
       ),
     );
   }
 }
 
+class MainDisplay extends StatefulWidget{
+  const MainDisplay({super.key});
+
+  @override
+  State<MainDisplay> createState() => _MainDisplayState();
+
+}
+
+class _MainDisplayState extends State<MainDisplay>{
+  String currentNote = "C2";
+
+  callback(newNote) {
+    setState(() {
+      currentNote = newNote;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return Column(
+      children: [
+        Flexible(
+          flex: 10,
+          child: Center(
+            child: Text(currentNote),
+          ),
+        ),
+        Flexible(
+          flex: 1,
+          child: Column(
+            children: [GuqinStringSelector(callback: callback),],
+          ),
+        )
+      ],
+    );
+  }
+}
+
 class GuqinStringSelector extends StatefulWidget {
-  const GuqinStringSelector({super.key});
+
+
+  const GuqinStringSelector({
+    super.key,
+    required this.callback,
+  }
+);
+
+  final Function callback;
 
   @override
   State<GuqinStringSelector> createState() => _GuqinStringSelectorState();
@@ -48,7 +78,7 @@ class GuqinStringSelector extends StatefulWidget {
 enum GuqinString { C2, D2, F2, G2, A2, C3, D3 }
 
 class _GuqinStringSelectorState extends State<GuqinStringSelector> {
-  GuqinString calendarView = GuqinString.C2;
+  GuqinString stringSelected = GuqinString.C2;
 
   @override
   Widget build(BuildContext context) {
@@ -84,13 +114,14 @@ class _GuqinStringSelectorState extends State<GuqinStringSelector> {
             value: GuqinString.D3,
             label: Text('7')),
       ],
-      selected: <GuqinString>{calendarView},
+      selected: <GuqinString>{stringSelected},
       onSelectionChanged: (Set<GuqinString> newSelection) {
         setState(() {
           // By default there is only a single segment that can be
           // selected at one time, so its value is always the first
           // item in the selected set.
-          calendarView = newSelection.first;
+          stringSelected = newSelection.first;
+          widget.callback(stringSelected.name);
         });
       },
     );
