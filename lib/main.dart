@@ -1,143 +1,148 @@
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+//import 'package:flutter_svg/flutter_svg.dart';
 
-class GuqinString {
-  const GuqinString({required this.number});
-
-  final String number;
+void main() {
+  runApp(const GuqinTunerApp());
 }
 
-typedef CartChangedCallback = Function(GuqinString product, bool inCart);
+class GuqinTunerApp extends StatelessWidget {
+  const GuqinTunerApp({super.key});
 
-class ShoppingListItem extends StatelessWidget {
-  ShoppingListItem({
-    required this.product,
-    required this.inCart,
-    required this.onCartChanged,
-  }) : super(key: ObjectKey(product));
-
-  final GuqinString product;
-  final bool inCart;
-  final CartChangedCallback onCartChanged;
-
-  Color _getColor(BuildContext context) {
-    return inCart //
-        ? Colors.black54
-        : Theme.of(context).primaryColor;
-  }
-
-  TextStyle? _getTextStyle(BuildContext context) {
-    if (!inCart) {
-      return const TextStyle(
-        color: Colors.blue,
-        fontWeight: FontWeight.normal,
-      );
-    }
-
-    return const TextStyle(
-      color: Colors.black54,
-      fontWeight: FontWeight.bold,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shadowColor: Colors.greenAccent,
-        elevation: 3,
-        shape: CircleBorder(),
-        padding: EdgeInsets.all(20),
-        minimumSize: Size(40, 40),
-      ),
-      onPressed: () {
-        onCartChanged(product, inCart);
-      },
-      child: Text(
-        product.number,
-        textAlign: TextAlign.center,
-        style: TextStyle(backgroundColor: Colors.blue),
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: MainDisplay(),
+        ),
       ),
     );
   }
 }
 
-class ShoppingList extends StatefulWidget {
-  const ShoppingList({required this.products, super.key});
-
-  final List<GuqinString> products;
-
-  // The framework calls createState the first time
-  // a widget appears at a given location in the tree.
-  // If the parent rebuilds and uses the same type of
-  // widget (with the same key), the framework re-uses
-  // the State object instead of creating a new State object.
+class MainDisplay extends StatefulWidget{
+  const MainDisplay({super.key});
 
   @override
-  State<ShoppingList> createState() => _ShoppingListState();
+  State<MainDisplay> createState() => _MainDisplayState();
+
 }
 
-class _ShoppingListState extends State<ShoppingList> {
-  final _shoppingCart = <GuqinString>{};
+class _MainDisplayState extends State<MainDisplay>{
+  String currentNote = "C2";
 
-  void _handleCartChanged(GuqinString product, bool inCart) {
+  callback(newNote) {
     setState(() {
-      // When a user changes what's in the cart, you need
-      // to change _shoppingCart inside a setState call to
-      // trigger a rebuild.
-      // The framework then calls build, below,
-      // which updates the visual appearance of the app.
-
-      if (!inCart) {
-        _shoppingCart.add(product);
-      } else {
-        _shoppingCart.remove(product);
-      }
+      currentNote = newNote;
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: SvgPicture.asset(
-          'assets/images/espresso.svg',
-          semanticsLabel: 'SVG Logo',
-        ),
-        title: const Text('Guqin App'),
-      ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: widget.products.map((product) {
-              return ShoppingListItem(
-                product: product,
-                inCart: _shoppingCart.contains(product),
-                onCartChanged: _handleCartChanged,
-              );
-            }).toList(),
+  Widget build(BuildContext context){
+    return Column(
+      children: [
+        Flexible(
+          flex: 10,
+          child: Center(
+            child: Text(currentNote),
           ),
-        ],
-      ),
+        ),
+        Flexible(
+          flex: 1,
+          child: Column(
+            children: [GuqinStringSelector(callback: callback),],
+          ),
+        )
+      ],
     );
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    title: 'Shopping App',
-    home: ShoppingList(
-      products: [
-        GuqinString(number: '1'),
-        GuqinString(number: '2'),
-        GuqinString(number: '3'),
-        GuqinString(number: '4'),
-        GuqinString(number: '5'),
-        GuqinString(number: '6'),
-        GuqinString(number: '7')
-      ],
-    ),
-  ));
+class GuqinStringSelector extends StatefulWidget {
+
+
+  const GuqinStringSelector({
+    super.key,
+    required this.callback,
+  }
+);
+
+  final Function callback;
+
+  @override
+  State<GuqinStringSelector> createState() => _GuqinStringSelectorState();
 }
+
+enum GuqinString { C2, D2, F2, G2, A2, C3, D3 }
+
+class _GuqinStringSelectorState extends State<GuqinStringSelector> {
+  GuqinString stringSelected = GuqinString.C2;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<GuqinString>(
+      style: SegmentedButton.styleFrom(
+        backgroundColor: Colors.grey[200],
+        foregroundColor: Colors.red,
+        selectedForegroundColor: Colors.white,
+        selectedBackgroundColor: Colors.green,
+      ),
+      showSelectedIcon: false,
+      segments: const <ButtonSegment<GuqinString>>[
+        ButtonSegment<GuqinString>(
+            value: GuqinString.C2,
+            label: Text("1"),
+            ),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.D2,
+            label: Text('2')),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.F2,
+            label: Text('3')),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.G2,
+            label: Text('4')),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.A2,
+            label: Text('5')),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.C3,
+            label: Text('6')),
+        ButtonSegment<GuqinString>(
+            value: GuqinString.D3,
+            label: Text('7')),
+      ],
+      selected: <GuqinString>{stringSelected},
+      onSelectionChanged: (Set<GuqinString> newSelection) {
+        setState(() {
+          // By default there is only a single segment that can be
+          // selected at one time, so its value is always the first
+          // item in the selected set.
+          stringSelected = newSelection.first;
+          widget.callback(stringSelected.name);
+        });
+      },
+    );
+  }
+}
+
+/**
+ * class ShoppingListItem extends StatelessWidget {
+    ShoppingListItem({
+    required this.product,
+    required this.inCart,
+    required this.onCartChanged,
+    }) : super(key: ObjectKey(product));
+ */
+
+/**
+ * appBar: AppBar(
+    leading: SvgPicture.asset(
+    'assets/images/espresso.svg',
+    semanticsLabel: 'SVG Logo',
+    ),
+    title: const Text('Guqin App'),
+    ),
+ */
